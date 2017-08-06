@@ -52,15 +52,6 @@ void prependTo(BEList *list, BlockEntry *data) {
 	list->num_nodes++;
 }
 
-// get first element matching key
-BlockEntry *getMatch(BEList *list, char *key) {
-	BEListNode *n = list->head;
-	while ((n != NULL) && strcmp(n->data->key, key) != 0 ) {
-		n = n->next;
-	}
-	return (n != NULL? n->data : NULL);
-}
-
 BlockEntry *unlinkElement(BEList *list, BEListNode *element);
 
 // Remove first node that contains the given data 

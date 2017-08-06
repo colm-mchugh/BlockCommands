@@ -32,11 +32,13 @@ cmdNode CommandList[] =
    ,{ "INS", "XWARP", "R~m`6w6.gQ$*~R@#7^&BJX.Hl#=pcuc6uQt-J+83Z::YjWZ~7^B^7M(%NBr29VF0);:QCPa{gxURQ1RelqE%?J'jjwz$OA1VYI(zvgv_`M33[b" }
    ,{ "INS", "HLWSM", "OHXQuv`MQ*RL~:C^xnn,JQ$p'><u#jSP4-~*$_TSg(|f?AE905CXcDIg_c^`N21`<1g>m=nVBl=_.`u<r" }
    ,{ "UPD", "IPEMF", "?<}{zM.,.H:sd)1T]QAw1MX(gK?Z#xt@6s<1" }
-   ,{ "DEL", "CHQLV", NULL }
+   ,{ "SEL", "IPEMF", NULL }
+   //,{ "DEL", "CHQLV", NULL }
+   ,{ "SEL", "IPEMF", NULL }
    ,{ "INS", "NPNBF", "G" }
    ,{ "SEL", "XWARP", NULL }
    ,{ "SEL", "IPEMF", NULL }
-   ,{ "DEL", "IPEMF", NULL }
+   //,{ "DEL", "IPEMF", NULL }
    ,{ "SEL", "BPVHN", NULL }
    ,{ "SEL", "FOONS", NULL }
    ,{ "INS", "UVHFC", "$Z+U5Z[JZ$Wis>~NNT`_#h1adzQ#0Zh26qeHLBp(CIo7eoc4DEqD.#'p{Vp-1Y<DL#juB{b&kwh[[z|~lB.mG{izls-G1Oq1" }
@@ -44,6 +46,11 @@ cmdNode CommandList[] =
    ,{ "SEL", "RQKHC", NULL }
    ,{ "SEL", "NPNBF", NULL }
    ,{ "SEL", "VWVWM", NULL }
+   ,{ "UPD", "RQKHC", "@#*$&@(#$&*@(#$&(*@#$&@(*#$&@(*#$&@(*#$&*(#@$&@#(*$&@#" }
+   ,{ "UPD", "NPNBF", "<<SDADSD>><<SDADSADSADSADWQ>>" }
+   ,{ "SEL", "UVHFC", NULL }
+   ,{ "SEL", "RQKHC", NULL }
+   ,{ "SEL", "NPNBF", NULL }
 };
 
 #endif /* #ifndef COMMANDS_SMALL_H */

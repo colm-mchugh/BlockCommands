@@ -9,7 +9,7 @@
 #define	BLOCK_MANAGER_H
 
 #include "commands_data.h"
-#include "BEHash.h"
+#include "OAHash.h"
 
 /**
  BlockManager provides the fundamental functionality for executing block commands.
@@ -28,7 +28,7 @@
  */
 typedef struct _blck_manager {
     BlockData *blockData;
-    BEHash *blockEntries;
+    OAHash *blockEntries;
     BlockEntry *lastAllocatedBlock;
 } BlockManager;
 

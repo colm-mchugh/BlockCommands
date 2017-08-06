@@ -1,5 +1,5 @@
 target := exec_commands
-C_SRCS := BEList.cpp BEHash.cpp block_manager.cpp main.cpp
+C_SRCS := BEList.cpp OAHash.cpp block_manager.cpp main.cpp hash.cpp
 C_OBJS := ${C_SRCS:.cpp=.o}
 C_FLAGS := -ggdb -Wno-write-strings
 CPP := g++

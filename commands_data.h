@@ -25,9 +25,8 @@ typedef struct _blockData {
 
 /**
  * BlockEntry provides metadata about key and its row:
- * - the starting position of the row in the block (position)
- * - the length of the row (length)
- * - the key identifying the row (key)
+ * - the starting position of the row in the block (offset)
+ * - block + offset: | Key | value length | value |
  * - the previously allocated block entry (nextOldest) 
  * - the next allocated block entry (nextNewest)
  * 
@@ -35,12 +34,16 @@ typedef struct _blockData {
  * BlockManager. 
  */
 typedef struct _blockEntry {
+    char *block;
     int offset;
     int length;
-    char key[5];
     struct _blockEntry *nextOldest;
     struct _blockEntry *nextNewest;
 } BlockEntry;
+
+#define KEY_SIZE 5
+
+bool key_compare(char *, char*);
 
 #endif	/* COMMANDS_DATA_H */
 

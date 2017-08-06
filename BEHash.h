@@ -9,11 +9,11 @@
 #define	BEHASH_H
 
 #include "BEList.h"
+#include "hash.h"
 
 // Basic hashtable implementation - uses BEList for 
 // each hash bucket
 
-#define DEFAULT_NUM_BUCKETS	31
 
 /*  BEHash provides a hashtable of Block Entry structures.
  *  It is implemented using a fixed number of buckets. 
@@ -22,14 +22,14 @@
  */
 typedef struct _hashtable {
 		BEList** buckets;
+                f_compare key_cmp;
+                f_hash  key_hash;
 		int num_buckets;
                 int num_entries;
 } BEHash;
 
-typedef char*  Hashkey;
-
 // Allocate a BEHash
-BEHash *createHash();
+BEHash *createBEHash(f_compare);
 
 // Delete a BEHash, apply deleter function to elements in the hash
 void deleteHash(BEHash**, deleter);
