@@ -41,7 +41,9 @@ typedef struct _blockEntry {
     struct _blockEntry *nextNewest;
 } BlockEntry;
 
-#define KEY_SIZE 5
+#define KEY_LEN 5
+
+#define KEY_SIZE KEY_LEN + 1
 
 bool key_compare(char *, char*);
 

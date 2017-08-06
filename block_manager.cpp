@@ -7,23 +7,21 @@
 typedef unsigned short len_t;
 
 void set_len(BlockEntry *b, len_t len) {
-    //len_t* len_addr = (len_t*)(b->block + b->offset + KEY_SIZE);
-    //*len_addr = len;
-    b->length = len;
+    len_t* len_addr = (len_t*)(b->block + b->offset + KEY_SIZE);
+    *len_addr = len;
 }
 
 len_t get_len(BlockEntry *b) {
-    //len_t* len_addr = (len_t*)(b->block + b->offset + KEY_SIZE);
-    //return *len_addr;
-    return b->length;
+    len_t* len_addr = (len_t*)(b->block + b->offset + KEY_SIZE);
+    return *len_addr;
 }
 
 bool key_compare(Hashkey k1, Hashkey k2) {
     int i = 0;
-    while (i < KEY_SIZE && k1[i] == k2[i]) {
+    while (i < KEY_LEN && k1[i] == k2[i]) {
         i++;
     }
-    return i == KEY_SIZE;
+    return i == KEY_LEN;
 }
 
 /**
@@ -61,9 +59,10 @@ void doInsert(BlockManager *blckManager, char* key, char* value) {
         printf("Key %s exists\n", key);
         return;
     }
-    len_t sz = strlen(value);
+    len_t value_size = strlen(value);
+    len_t total_size = value_size + KEY_SIZE + sizeof(len_t);
     // Is there enough space?
-    if (blckManager->blockData->freeSize - (sz + KEY_SIZE) < 0) {
+    if (blckManager->blockData->freeSize - (total_size) < 0) {
         printf("Block is too full to insert %s\n", key);
         return;
     }
@@ -76,9 +75,10 @@ void doInsert(BlockManager *blckManager, char* key, char* value) {
     BlockEntry *newBE = (BlockEntry*) malloc(sizeof (BlockEntry));
     newBE->block = blckManager->blockData->block;
     newBE->offset = offset;
-    strncpy(base + offset, key, KEY_SIZE);
-    set_len(newBE, sz);
-    strncpy(base + offset + KEY_SIZE, value, sz);
+    assert(strlen(key) == KEY_LEN);
+    strcpy(base + offset, key);
+    set_len(newBE, value_size);
+    strncpy(base + offset + KEY_SIZE + sizeof(len_t), value, value_size);
 
     // The new block entry now becomes the last allocated block
     // of the block manager
@@ -93,8 +93,8 @@ void doInsert(BlockManager *blckManager, char* key, char* value) {
     AddOA(blckManager->blockEntries, key, newBE);
 
     // Update the sizing metadata in blockData:
-    blckManager->blockData->freeSize -= sz + KEY_SIZE;
-    blckManager->blockData->nextFreeOffset += sz + KEY_SIZE; // next entry will go after this one 
+    blckManager->blockData->freeSize -= total_size;
+    blckManager->blockData->nextFreeOffset += total_size; // next entry will go after this one 
     printState(blckManager);
 }
 
@@ -110,7 +110,7 @@ void doSelect(BlockManager *blckManager, char* key) {
         // print its chars 1 by 1, using the block entry's length 
         // to stop..
         char *block = blckManager->blockData->block;
-        int valueOffset = entry->offset + KEY_SIZE;
+        int valueOffset = entry->offset + KEY_SIZE + sizeof(len_t);
         int len = get_len(entry);
         for (int i = 0; i < len; i++) {
             putchar(block[valueOffset + i]);
@@ -128,11 +128,12 @@ void doBlockMove(BlockManager *blckManager, int offset, BlockEntry* start) {
     int startPos = (start != NULL ? start->offset : 0);
     char *base = blckManager->blockData->block;
     for (BlockEntry *be = start; be != NULL; be = be->nextNewest) {
-        be->offset = nextOffset;
         len_t len = get_len(be);
-        nextOffset += len + KEY_SIZE;
+        be->offset = nextOffset;
+        len_t total_size = KEY_SIZE + sizeof(len_t) + len;
+        nextOffset += total_size;
     }
-    strncpy(base + offset, base + startPos, nextOffset - offset);
+    memcpy(base + offset, base + startPos, nextOffset - offset);
     blckManager->blockData->nextFreeOffset = nextOffset;
 }
 
@@ -146,7 +147,8 @@ void doDelete(BlockManager *blckManager, char *key) {
         // There is a value for the given key in the block: 
         // Adjust the block manager's free size accordingly
         len_t len = get_len(entry);
-        blckManager->blockData->freeSize += len + KEY_SIZE;
+        len_t total_size = KEY_SIZE + sizeof(len_t) + len;
+        blckManager->blockData->freeSize += total_size;
         // Remove the entry from the block manager's entry table
         DeleteOA(blckManager->blockEntries, key);
         // Get the next newest block
@@ -183,9 +185,10 @@ void doUpdate(BlockManager *blckManager, char* key, char* value) {
         printf("Key %s doesn't exist\n", key);
         return;
     }
-    len_t sz = strlen(value);
+    len_t new_value_len = strlen(value);
+    len_t total_size = KEY_SIZE + sizeof(len_t) + new_value_len;
     // Verify that there is enough overall free space for this update
-    if (blckManager->blockData->freeSize + sz + KEY_SIZE > blckManager->blockData->size) {
+    if (blckManager->blockData->freeSize + total_size > blckManager->blockData->size) {
         printf("Block is too full to update row to %s\n", value);
         return;
     }
@@ -193,15 +196,15 @@ void doUpdate(BlockManager *blckManager, char* key, char* value) {
     int offset = entry->offset;
     // There will be a gap of size |entry->length - sz| in the block. This can be 
     // plugged by moving newer blocks to the start of this gap.
-    doBlockMove(blckManager, offset + KEY_SIZE + sz, entry->nextNewest);
+    doBlockMove(blckManager, offset + total_size, entry->nextNewest);
     // Copy the given value into the block starting at the entry's
     // position
-    strncpy(base + offset + KEY_SIZE, value, sz);
+    strncpy(base + offset + KEY_SIZE + sizeof(len_t), value, new_value_len);
     // Update free size - could be a -ve adjustment if new value is longer than
     // the previous value
-    len_t len = get_len(entry);
-    blckManager->blockData->freeSize += len - sz; 
-    set_len(entry, sz);
+    len_t curr_value_len = get_len(entry);
+    blckManager->blockData->freeSize += curr_value_len - new_value_len; 
+    set_len(entry, new_value_len);
     printState(blckManager);
 }
 

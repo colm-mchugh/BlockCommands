@@ -32,7 +32,7 @@ typedef struct _blck_manager {
     BlockEntry *lastAllocatedBlock;
 } BlockManager;
 
-#define BLOCK_SIZE 4096
+#define BLOCK_SIZE (4096 * 128)
 
 BlockManager *createBlockManager(int block_size);
 

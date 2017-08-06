@@ -7,7 +7,6 @@
 #include "hash.h"
 #include "assert.h"
 
-
 typedef unsigned short len_t;
 
 void f() { 
@@ -22,6 +21,17 @@ void f() {
     
 }
 
+cmdNode SimpleCommandList[] =
+{
+    { "INS", "ABCDE", "data_abcd" }
+   ,{ "INS", "FGHIJ", "data_loads_and_loads_of_data" }
+   ,{ "INS", "KLMNO", "_more_data_yahooo" }
+   ,{ "DEL", "FGHIJ", NULL }
+   ,{ "INS", "PQRST", "even_more_data_" }
+   ,{ "INS", "UVWXY", "AND_MORE_HERE" }
+   ,{ "UPD", "KLMNO", "Shorter" }
+   ,{ "UPD", "PQRST", "LongerAndLongerAndLonger" }
+};
 
 int main() {
     int i;
