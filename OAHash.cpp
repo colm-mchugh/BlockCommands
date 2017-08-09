@@ -5,6 +5,8 @@
 #include <assert.h>
 #include <stdio.h>
 
+#define DELETED ((BlockEntry*)0x1)
+
 OAHash *createOAHash(f_compare cmp_keys) {
     OAHash *newHash = (OAHash*) malloc(sizeof (OAHash));
     newHash->htable = (BlockEntry**) malloc(sizeof (BlockEntry**) * DEFAULT_NUM_BUCKETS);
@@ -23,11 +25,10 @@ unsigned int findIndexOf(OAHash *h, Hashkey key) {
     unsigned int i = idx;
     bool found = false;
     while (i < h->size && h->htable[i] != NULL) {
-        if ((h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset)) {
+        if (h->htable[i] != DELETED && (h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset)) {
             found = true;
             break;
         }
-        h->collisions++;
         i++;
     }
     return (found ? i : -1);
@@ -46,7 +47,8 @@ BlockEntry *LookupOA(OAHash *h, Hashkey key) {
 void AddOA(OAHash *h, Hashkey key, BlockEntry* data) {
     unsigned int idx = (h->hash_key)(key) % h->size;
     unsigned int i = idx;
-    while (i < h->size && h->htable[i] != NULL && !((h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset))) {
+    while (i < h->size && h->htable[i] != NULL && h->htable[i] != DELETED 
+            && !((h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset))) {
         i++;
         h->collisions++;
     }
@@ -54,7 +56,6 @@ void AddOA(OAHash *h, Hashkey key, BlockEntry* data) {
     h->htable[i] = data;
     h->num_entries++;
     h->inserts++;
-    //printf("hash is %d, insert index is %d\n", idx, i);
     assert(h->num_entries <= h->size);
 }
 
@@ -63,7 +64,7 @@ BlockEntry* DeleteOA(OAHash* h, Hashkey key) {
     BlockEntry* data = NULL;
     if (i != -1) {
         data = h->htable[i];
-        h->htable[i] = NULL;
+        h->htable[i] = DELETED;
         h->num_entries--;
         h->deletes++;
     }
@@ -72,8 +73,14 @@ BlockEntry* DeleteOA(OAHash* h, Hashkey key) {
 
 void deleteOAHash(OAHash* h) {
     // toDO
-    printf("Number of collisions: %d\n", h->collisions);
+    int delete_holes = 0;
+    for (int i = 0; i < h->size; i++) {
+        if (h->htable[i] == DELETED) {
+            delete_holes++;
+        }
+    }
+    printf("Number of insert collisions: %d\n", h->collisions);
     printf("Number of inserts: %d\n", h->inserts);
     printf("Number of deletes: %d\n", h->deletes);
-
+    printf("Number of delete holes: %d\n", delete_holes);
 }
