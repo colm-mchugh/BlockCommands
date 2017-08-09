@@ -72,7 +72,6 @@ BlockEntry* DeleteOA(OAHash* h, Hashkey key) {
 }
 
 void deleteOAHash(OAHash* h) {
-    // toDO
     int delete_holes = 0;
     for (int i = 0; i < h->size; i++) {
         if (h->htable[i] == DELETED) {
@@ -83,4 +82,11 @@ void deleteOAHash(OAHash* h) {
     printf("Number of inserts: %d\n", h->inserts);
     printf("Number of deletes: %d\n", h->deletes);
     printf("Number of delete holes: %d\n", delete_holes);
+    for (int i = 0; i < h->size; i++) {
+        if (h->htable[i] != NULL && h->htable[i] != DELETED) {
+            BlockEntry *b = h->htable[i];
+            free(b);
+            h->htable[i] = NULL;
+        }
+    }
 }
