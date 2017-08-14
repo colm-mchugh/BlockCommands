@@ -25,7 +25,7 @@ unsigned int findIndexOf(OAHash *h, Hashkey key) {
     unsigned int i = idx;
     bool found = false;
     while (i < h->size && h->htable[i] != NULL) {
-        if (h->htable[i] != DELETED && (h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset)) {
+        if (h->htable[i] != DELETED && (h->cmp_keys)(key, h->block + h->htable[i]->offset)) {
             found = true;
             break;
         }
@@ -48,7 +48,7 @@ void AddOA(OAHash *h, Hashkey key, BlockEntry* data) {
     unsigned int idx = (h->hash_key)(key) % h->size;
     unsigned int i = idx;
     while (i < h->size && h->htable[i] != NULL && h->htable[i] != DELETED 
-            && !((h->cmp_keys)(key, h->htable[i]->block + h->htable[i]->offset))) {
+            && !((h->cmp_keys)(key, h->block + h->htable[i]->offset))) {
         i++;
         h->collisions++;
     }

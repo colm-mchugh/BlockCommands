@@ -34,9 +34,7 @@ typedef struct _blockData {
  * BlockManager. 
  */
 typedef struct _blockEntry {
-    char *block;
     int offset;
-    int length;
     struct _blockEntry *nextOldest;
     struct _blockEntry *nextNewest;
 } BlockEntry;

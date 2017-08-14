@@ -13,6 +13,7 @@
 
 typedef struct _hashtable {
 		BlockEntry** htable;
+		char *block;
                 f_compare cmp_keys;
                 f_hash hash_key;
                 int size;
